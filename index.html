@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
+
+<meta name="theme-color" content="#02040a">
+
+<title>Cyber Runner 3D</title>
+
+<style>
+
+/* =========================================================
+   CYBER RUNNER 3D
+   ONLINE EDITION
+   Coded with Yash Badgujar
+========================================================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#02040a;
+    font-family:Arial,Helvetica,sans-serif;
+    touch-action:none;
+}
+
+body{
+    position:relative;
+    color:white;
+}
+
+/* ================= GAME CANVAS ================= */
+
+#game-canvas{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    display:block;
+    z-index:1;
+}
+
+/* ================= HUD ================= */
+
+#hud{
+    position:fixed;
+    top:15px;
+    left:15px;
+    right:15px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+
+    z-index:10;
+    pointer-events:none;
+}
+
+.hud-left{
+    display:flex;
+    gap:10px;
+}
+
+.hud-box{
+    min-width:105px;
+
+    padding:9px 13px;
+
+    border:1px solid #00ffff;
+    border-radius:9px;
+
+    background:rgba(0,12,25,.82);
+
+    box-shadow:
+        0 0 10px rgba(0,255,255,.35),
+        inset 0 0 12px rgba(0,255,255,.08);
+
+    text-align:center;
+}
+
+.hud-label{
+    display:block;
+
+    color:#7dfcff;
+    font-size:9px;
+    letter-spacing:2px;
+}
+
+.hud-value{
+    display:block;
+
+    margin-top:4px;
+
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+}
+
+/* ================= SHIELD ================= */
+
+#shield-box{
+    position:fixed;
+
+    top:90px;
+    left:15px;
+
+    width:190px;
+
+    z-index:10;
+}
+
+#shield-container{
+    width:160px;
+    height:9px;
+
+    margin-top:6px;
+
+    overflow:hidden;
+
+    border:1px solid #00ffff;
+    border-radius:10px;
+
+    background:rgba(0,255,255,.08);
+}
+
+#shield-bar{
+    width:100%;
+    height:100%;
+
+    background:#00ffff;
+
+    box-shadow:0 0 12px #00ffff;
+
+    transition:width .2s linear;
+}
+
+/* ================= PAUSE ================= */
+
+#pause-btn{
+    position:fixed;
+
+    top:90px;
+    right:15px;
+
+    width:45px;
+    height:45px;
+
+    z-index:15;
+
+    border:1px solid #ff00ff;
+    border-radius:50%;
+
+    background:rgba(25,0,35,.85);
+
+    color:#ff00ff;
+
+    font-size:17px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 0 15px rgba(255,0,255,.45);
+}
+
+#pause-btn:active{
+    transform:scale(.9);
+}
+
+/* ================= SCREENS ================= */
+
+.screen{
+    position:fixed;
+    inset:0;
+
+    z-index:20;
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+
+    padding:20px;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(0,255,255,.13),
+            rgba(0,0,0,.97) 70%
+        );
+}
+
+.hidden{
+    display:none !important;
+}
+
+/* ================= MENU CARD ================= */
+
+.menu-card{
+    width:min(92%,520px);
+
+    padding:40px 25px;
+
+    text-align:center;
+
+    border:1px solid rgba(0,255,255,.7);
+    border-radius:20px;
+
+    background:rgba(2,10,20,.94);
+
+    box-shadow:
+        0 0 35px rgba(0,255,255,.18),
+        inset 0 0 30px rgba(0,255,255,.04);
+}
+
+/* ================= TITLE ================= */
+
+.game-title{
+    color:#00ffff;
+
+    font-size:clamp(35px,8vw,65px);
+
+    font-weight:900;
+    letter-spacing:4px;
+
+    text-shadow:
+        0 0 5px #00ffff,
+        0 0 15px #00ffff,
+        0 0 35px #0088ff;
+
+    animation:neonGlow 1.8s infinite alternate;
+}
+
+@keyframes neonGlow{
+
+    from{
+        text-shadow:
+            0 0 5px #00ffff,
+            0 0 15px #00ffff;
+    }
+
+    to{
+        text-shadow:
+            0 0 10px #00ffff,
+            0 0 30px #00ffff,
+            0 0 55px #0088ff;
+    }
+}
+
+.game-subtitle{
+    margin-top:10px;
+    margin-bottom:30px;
+
+    color:#7dfcff;
+
+    font-size:11px;
+    letter-spacing:4px;
+}
+
+/* ================= BUTTON ================= */
+
+.main-button{
+    min-width:220px;
+
+    padding:15px 28px;
+
+    border:2px solid #00ffff;
+    border-radius:9px;
+
+    background:rgba(0,255,255,.08);
+
+    color:#00ffff;
+
+    font-size:15px;
+    font-weight:bold;
+
+    letter-spacing:2px;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 0 12px rgba(0,255,255,.35);
+
+    transition:.2s;
+}
+
+.main-button:hover{
+    background:#00ffff;
+    color:#001014;
+
+    transform:scale(1.04);
+
+    box-shadow:
+        0 0 20px #00ffff,
+        0 0 40px rgba(0,255,255,.4);
+}
+
+.main-button:active{
+    transform:scale(.95);
+}
+
+/* ================= INSTRUCTIONS ================= */
+
+.instructions{
+    margin-top:25px;
+
+    color:#a7c7cc;
+
+    font-size:11px;
+
+    line-height:2;
+}
+
+.instructions strong{
+    color:#00ffff;
+    letter-spacing:2px;
+}
+
+/* ================= CREATOR ================= */
+
+.creator-credit{
+    margin-top:28px;
+
+    color:#00ffff;
+
+    font-family:
+        "Segoe Print",
+        "Bradley Hand",
+        "Comic Sans MS",
+        cursive;
+
+    font-size:25px;
+    font-weight:bold;
+
+    transform:rotate(-2deg);
+
+    text-shadow:
+        0 0 5px #00ffff,
+        0 0 12px #00ffff,
+        0 0 22px #00ffff;
+}
+
+/* ================= GAME OVER ================= */
+
+.score-label{
+    margin-top:20px;
+
+    color:#a7c7cc;
+
+    font-size:13px;
+    letter-spacing:2px;
+}
+
+.big-score{
+    margin:5px 0 20px;
+
+    color:#00ffff;
+
+    font-size:38px;
+    font-weight:bold;
+
+    text-shadow:0 0 10px #00ffff;
+}
+
+/* ================= MOBILE CONTROLS ================= */
+
+#mobile-controls{
+    position:fixed;
+
+    left:0;
+    right:0;
+    bottom:20px;
+
+    z-index:15;
+
+    display:flex;
+
+    justify-content:space-between;
+    align-items:center;
+
+    padding:0 20px;
+
+    pointer-events:none;
+}
+
+.control-group{
+    display:flex;
+
+    gap:12px;
+
+    pointer-events:auto;
+}
+
+.control-btn{
+    width:62px;
+    height:62px;
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+
+    border:2px solid #00ffff;
+    border-radius:50%;
+
+    background:rgba(0,20,30,.82);
+
+    color:#00ffff;
+
+    font-size:25px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 0 12px rgba(0,255,255,.35);
+
+    touch-action:manipulation;
+}
+
+.control-btn:active{
+    background:#00ffff;
+
+    color:#001014;
+
+    transform:scale(.88);
+
+    box-shadow:0 0 25px #00ffff;
+}
+
+/* ================= SCANLINES ================= */
+
+body::after{
+    content:"";
+
+    position:fixed;
+    inset:0;
+
+    z-index:5;
+
+    pointer-events:none;
+
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            rgba(255,255,255,.025),
+            rgba(255,255,255,.025) 1px,
+            transparent 1px,
+            transparent 4px
+        );
+
+    opacity:.35;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:600px){
+
+    #hud{
+        top:8px;
+        left:8px;
+        right:8px;
+    }
+
+    .hud-left{
+        width:100%;
+        justify-content:space-between;
+        gap:5px;
+    }
+
+    .hud-box{
+        min-width:0;
+        flex:1;
+        padding:7px 5px;
+    }
+
+    .hud-label{
+        font-size:7px;
+    }
+
+    .hud-value{
+        font-size:14px;
+    }
+
+    #shield-box{
+        top:68px;
+        left:8px;
+        width:145px;
+        padding:7px;
+    }
+
+    #shield-container{
+        width:125px;
+    }
+
+    #pause-btn{
+        top:68px;
+        right:8px;
+
+        width:40px;
+        height:40px;
+    }
+
+    .menu-card{
+        padding:30px 17px;
+    }
+
+    .creator-credit{
+        font-size:21px;
+    }
+
+    .control-btn{
+        width:56px;
+        height:56px;
+        font-size:22px;
+    }
+}
+
+/* ================= DESKTOP ================= */
+
+@media(min-width:800px){
+
+    #mobile-controls{
+        display:none;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ================= GAME CANVAS ================= -->
+
+<canvas id="game-canvas"></canvas>
+
+<!-- ================= HUD ================= -->
+
+<div id="hud">
+
+    <div class="hud-left">
+
+        <div class="hud-box">
+            <span class="hud-label">SCORE</span>
+            <span class="hud-value" id="score">000000</span>
+        </div>
+
+        <div class="hud-box">
+            <span class="hud-label">COINS</span>
+            <span class="hud-value" id="coins">0</span>
+        </div>
+
+        <div class="hud-box">
+            <span class="hud-label">SPEED</span>
+            <span class="hud-value" id="speed">1.0x</span>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= SHIELD ================= -->
+
+<div class="hud-box" id="shield-box">
+
+    <span class="hud-label">SHIELD</span>
+
+    <div id="shield-container">
+        <div id="shield-bar"></div>
+    </div>
+
+</div>
+
+<!-- ================= PAUSE ================= -->
+
+<button id="pause-btn" aria-label="Pause game">
+    Ⅱ
+</button>
+
+<!-- ================= START SCREEN ================= -->
+
+<div class="screen" id="start-screen">
+
+    <div class="menu-card">
+
+        <div class="game-title">
+            CYBER RUNNER 3D
+        </div>
+
+        <div class="game-subtitle">
+            ONLINE NEON RUN
+        </div>
+
+        <button class="main-button" id="start-btn">
+            INITIALIZE GAME
+        </button>
+
+        <div class="instructions">
+
+            <strong>CONTROLS</strong>
+
+            <br>
+
+            A / D or ← / → &nbsp; MOVE
+
+            <br>
+
+            SPACE / W / ↑ &nbsp; JUMP
+
+            <br>
+
+            P &nbsp; PAUSE
+
+        </div>
+
+        <div class="creator-credit">
+            Coded with Yash Badgujar
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= PAUSE SCREEN ================= -->
+
+<div class="screen hidden" id="pause-screen">
+
+    <div class="menu-card">
+
+        <div class="game-title">
+            PAUSED
+        </div>
+
+        <div class="game-subtitle">
+            RUN SUSPENDED
+        </div>
+
+        <button class="main-button" id="resume-btn">
+            RESUME
+        </button>
+
+        <div class="creator-credit">
+            Coded with Yash Badgujar
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= GAME OVER ================= -->
+
+<div class="screen hidden" id="game-over">
+
+    <div class="menu-card">
+
+        <div class="game-title">
+            GAME OVER
+        </div>
+
+        <div class="score-label">
+            FINAL SCORE
+        </div>
+
+        <div class="big-score" id="final-score">
+            0
+        </div>
+
+        <div class="score-label">
+            HIGH SCORE
+        </div>
+
+        <div class="big-score" id="high-score">
+            0
+        </div>
+
+        <button class="main-button" id="restart-btn">
+            RUN AGAIN
+        </button>
+
+        <div class="creator-credit">
+            Coded with Yash Badgujar
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= MOBILE CONTROLS ================= -->
+
+<div id="mobile-controls">
+
+    <div class="control-group">
+
+        <button class="control-btn" id="left-btn">
+            ←
+        </button>
+
+        <button class="control-btn" id="right-btn">
+            →
+        </button>
+
+    </div>
+
+    <div class="control-group">
+
+        <button class="control-btn" id="jump-btn">
+            ↑
+        </button>
+
+    </div>
+
+</div>
+
+<!-- =====================================================
+     ONLINE THREE.JS
+     NO three.min.js DOWNLOAD REQUIRED
+====================================================== -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- GAME ENGINE -->
+
+<script src="game.js"></script>
+
+</body>
+</html>
